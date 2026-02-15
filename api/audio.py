@@ -8,11 +8,11 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 if not OPENAI_API_KEY:
     raise Exception("OPENAI_API_KEY is missing in environment variables.")
 
-OPENAI_URL = "https://api.openai.com/v1/videos/generations"
+OPENAI_URL = "https://api.openai.com/v1/audio/speech"
 
 app = FastAPI(
-    title="Broken Video Generator API",
-    description="Generate AI videos using OpenAI.",
+    title="Broken Audio Generator API",
+    description="Generate AI audio using OpenAI TTS.",
     version="1.0.0"
 )
 
@@ -26,23 +26,24 @@ app.add_middleware(
 @app.get("/")
 def home():
     return {
-        "message": "Broken Video Generator API 🎬🔥",
-        "usage": "/generate?prompt=robot%20dancing"
+        "message": "Broken Audio Generator API 🔊🔥",
+        "usage": "/generate?text=habari%20yako"
     }
 
 @app.get("/generate")
-async def generate(prompt: str = Query(..., min_length=3)):
+async def generate(text: str = Query(..., min_length=2)):
     headers = {
         "Authorization": f"Bearer {OPENAI_API_KEY}",
         "Content-Type": "application/json"
     }
 
     payload = {
-        "model": "gpt-4o-mini-video",   # ⭐ MODEL SAHIHI
-        "prompt": prompt
+        "model": "gpt-4o-mini-tts",
+        "voice": "alloy",
+        "input": text
     }
 
-    async with httpx.AsyncClient(timeout=120.0) as client:
+    async with httpx.AsyncClient(timeout=60.0) as client:
         response = await client.post(OPENAI_URL, json=payload, headers=headers)
 
     if response.status_code != 200:
@@ -52,6 +53,6 @@ async def generate(prompt: str = Query(..., min_length=3)):
         )
 
     return {
-        "prompt": prompt,
-        "result": response.json()
+        "text": text,
+        "audio_base64": response.json().get("audio")
     }
