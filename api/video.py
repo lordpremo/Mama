@@ -38,20 +38,20 @@ async def generate(prompt: str = Query(..., min_length=3)):
     }
 
     payload = {
-        "model": "gpt-4o-mini-tts",
+        "model": "gpt-4o-mini-video",   # ⭐ MODEL SAHIHI
         "prompt": prompt
     }
 
-    async with httpx.AsyncClient(timeout=60.0) as client:
+    async with httpx.AsyncClient(timeout=120.0) as client:
         response = await client.post(OPENAI_URL, json=payload, headers=headers)
 
     if response.status_code != 200:
         raise HTTPException(
             status_code=response.status_code,
-            detail="Failed to generate video from OpenAI."
+            detail=response.text
         )
 
     return {
         "prompt": prompt,
         "result": response.json()
-}
+    }
