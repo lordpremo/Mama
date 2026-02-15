@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "api/video.py", "use": "@vercel/python" }
+  ],
+  "routes": [
+    { "src": "/generate", "dest": "api/video.py" },
+    { "src": "/", "dest": "api/video.py" }
+  ]
+}
