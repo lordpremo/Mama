@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <title>BROKEN LORD – HTML Tools Suite</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Icon -->
+    <link rel="icon" type="image/png" href="https://upcdn.io/kW2K8mM/raw/uploads/2026/02/16/4j9xj5tp25-5c9c8c2f-632f-4d7d-b783-9480ad265013.png">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #05030a;
+            color: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            background: radial-gradient(circle at top, #3b1b7a 0, #05030a 55%);
+        }
+
+        header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+        }
+
+        header span {
+            font-size: 11px;
+            opacity: 0.7;
+        }
+
+        main {
+            flex: 1;
+            padding: 16px;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 18px;
+        }
+
+        @media (min-width: 900px) {
+            .tools-grid {
+                grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            }
+        }
+
+        .panel {
+            background: radial-gradient(circle at top left, rgba(123, 97, 255, 0.16), transparent 55%);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .panel h2 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            opacity: 0.9;
+        }
+
+        .panel small {
+            font-size: 11px;
+            opacity: 0.7;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 220px;
+            resize: vertical;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(3, 2, 10, 0.9);
+            color: #f5f5f5;
+            padding: 10px 12px;
+            font-size: 13px;
+            font-family: "JetBrains Mono", "Fira Code", monospace;
+            outline: none;
+        }
+
+        textarea:focus {
+            border-color: #9b6bff;
+            box-shadow: 0 0 0 1px rgba(155, 107, 255, 0.4);
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 999px;
+            padding: 9px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #b26bff, #5f2bff);
+            color: #fff;
+            box-shadow: 0 0 18px rgba(178, 107, 255, 0.45);
+            white-space: nowrap;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.25);
+            box-shadow: none;
+        }
+
+        .status {
+            font-size: 11px;
+            opacity: 0.8;
+            text-align: center;
+        }
+
+        .url-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .url-row input {
+            flex: 1;
+            min-width: 220px;
+            padding: 8px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.18);
+            background: rgba(3, 2, 10, 0.9);
+            color: #f5f5f5;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .url-row input:focus {
+            border-color: #9b6bff;
+            box-shadow: 0 0 0 1px rgba(155, 107, 255, 0.4);
+        }
+
+        .lists-wrap {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .list-block h3 {
+            margin: 0 0 4px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            opacity: 0.85;
+        }
+
+        .list {
+            font-size: 12px;
+            background: rgba(3, 2, 10, 0.9);
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            padding: 6px 8px;
+            max-height: 200px;
+            overflow: auto;
+        }
+
+        .list-item {
+            padding: 4px 4px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            word-break: break-all;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .list-item:last-child {
+            border-bottom: none;
+        }
+
+        .list-item:hover {
+            background: rgba(178, 107, 255, 0.18);
+        }
+
+        .list-item.active {
+            background: rgba(178, 107, 255, 0.35);
+            color: #fff;
+        }
+
+        .viewer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            opacity: 0.85;
+        }
+
+        .viewer-header span {
+            max-width: 70%;
+            word-break: break-all;
+        }
+
+        footer {
+            padding: 10px 16px 14px;
+            text-align: center;
+            font-size: 11px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.7);
+            border-top: 1px solid rgba(255,255,255,0.08);
+            background: #05030a;
+        }
+
+        footer span {
+            color: #b26bff;
+            font-weight: 600;
+        }
+
+        .section-title {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            opacity: 0.8;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <img src="https://upcdn.io/kW2K8mM/raw/uploads/2026/02/16/4j9xj5tp25-5c9c8c2f-632f-4d7d-b783-9480ad265013.png" alt="Icon">
+    <div>
+        <h1>BROKEN LORD – HTML Tools Suite</h1>
+        <span>Protect HTML • Fichua HTML • Scan Links (HTML + Files) – all in one</span>
+    </div>
+</header>
+
+<main>
+
+    <div class="section-title">HTML PROTECTOR & UNPROTECTOR</div>
+
+    <div class="tools-grid">
+        <!-- PROTECTOR -->
+        <section class="panel" id="protectorPanel">
+            <h2>HTML Protector</h2>
+            <small>Paste HTML yako ➜ Pata HTML iliyofichwa (Base64 + iframe loader)</small>
+
+            <textarea id="protectInput" placeholder="Paste HTML yako hapa..."></textarea>
+
+            <div class="controls">
+                <button class="btn" id="protectBtn">Protect HTML</button>
+                <button class="btn btn-secondary" id="protectClearBtn">Clear</button>
+            </div>
+
+            <div class="status" id="protectStatus">
+                Ready: weka HTML kisha bonyeza Protect HTML.
+            </div>
+
+            <textarea id="protectOutput" placeholder="HTML iliyofichwa itaonekana hapa..." readonly></textarea>
+
+            <div class="controls">
+                <button class="btn btn-secondary" id="protectCopyBtn">Copy Protected</button>
+            </div>
+
+            <div class="status" id="protectCopyStatus">
+                Hakuna kitu bado kimecopiwa.
+            </div>
+        </section>
+
+        <!-- UNPROTECTOR -->
+        <section class="panel" id="unprotectorPanel">
+            <h2>HTML Unprotector</h2>
+            <small>Paste protected HTML (ile ya iframe loader) ➜ Pata HTML halisi</small>
+
+            <textarea id="unprotectInput" placeholder="Paste protected HTML hapa..."></textarea>
+
+            <div class="controls">
+                <button class="btn" id="unprotectBtn">Fichua HTML</button>
+                <button class="btn btn-secondary" id="unprotectClearBtn">Clear</button>
+            </div>
+
+            <div class="status" id="unprotectStatus">
+                Ready: weka protected HTML kisha bonyeza Fichua HTML.
+            </div>
+
+            <textarea id="unprotectOutput" placeholder="HTML halisi itaonekana hapa..." readonly></textarea>
+
+            <div class="controls">
+                <button class="btn btn-secondary" id="unprotectCopyBtn">Copy HTML</button>
+            </div>
+
+            <div class="status" id="unprotectCopyStatus">
+                Hakuna kitu bado kimecopiwa.
+            </div>
+        </section>
+    </div>
+
+    <div class="section-title">LINK INSPECTOR PRO</div>
+
+    <!-- LINK INSPECTOR FULL WIDTH -->
+    <section class="panel" id="inspectorPanel">
+        <h2>Link Inspector PRO</h2>
+        <small>Weka link ➜ HTML + CSS/JS files ➜ bofya file uone code yake (kupitia proxy)</small>
+
+        <div class="url-row">
+            <input type="url" id="urlInput" placeholder="https://...">
+            <button class="btn" id="scanBtn">Scan Link</button>
+        </div>
+
+        <div class="status" id="statusText">
+            Ready: weka link halafu bonyeza Scan Link.
+        </div>
+
+        <h2 style="margin-top:10px;">Main HTML</h2>
+        <small>Hii ndiyo HTML ya ukurasa mkuu</small>
+        <textarea id="htmlOutput" placeholder="HTML ya ukurasa itaonekana hapa..." readonly></textarea>
+
+        <div class="lists-wrap" style="margin-top:10px;">
+            <div class="list-block">
+                <h3>CSS FILES</h3>
+                <div class="list" id="cssList">
+                    <div>Hakuna bado.</div>
+                </div>
+            </div>
+
+            <div class="list-block">
+                <h3>JS FILES</h3>
+                <div class="list" id="jsList">
+                    <div>Hakuna bado.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="viewer-header" style="margin-top:10px;">
+            <span id="currentFile">Hakuna file lililochaguliwa.</span>
+            <button class="btn btn-secondary" id="copyCodeBtn" style="padding:6px 12px;font-size:11px;">
+                Copy Code
+            </button>
+        </div>
+
+        <textarea id="fileViewer" placeholder="Code ya file utakalobofya itaonekana hapa..." readonly></textarea>
+
+        <div class="status" id="viewerStatus">
+            Bofya file upande wa juu ili kujaribu kufetch code yake (kupitia proxy).
+        </div>
+    </section>
+
+</main>
+
+<footer>
+    ®alright by <span>broken lord</span>
+</footer>
+
+<script>
+    // PROXY YA VERCEL – itaenda /api/proxy.php
+    const PROXY_URL = '/api/proxy.php?url=';
+
+    /* ========== PROTECTOR ========== */
+
+    const protectInput       = document.getElementById('protectInput');
+    const protectOutput      = document.getElementById('protectOutput');
+    const protectStatus      = document.getElementById('protectStatus');
+    const protectCopyStatus  = document.getElementById('protectCopyStatus');
+    const protectBtn         = document.getElementById('protectBtn');
+    const protectClearBtn    = document.getElementById('protectClearBtn');
+    const protectCopyBtn     = document.getElementById('protectCopyBtn');
+
+    function buildProtectedHtml(encoded) {
+        return (
+`<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>🖕🖕🖕 fucker</title>
+<style>
+    html,body { margin:0; padding:0; height:100%; overflow:hidden; }
+    iframe { width:100%; height:100%; border:0; }
+</style>
+</head>
+<body>
+<iframe id="x"></iframe>
+<script>
+    (function(){
+        var data = "${encoded}";
+        var html = decodeURIComponent(escape(atob(data)));
+        var frame = document.getElementById("x").contentWindow.document;
+        frame.open();
+        frame.write(html);
+        frame.close();
+    })();
+<\/script>
+</body>
+</html>`
+        );
+    }
+
+    protectBtn.addEventListener('click', () => {
+        const raw = protectInput.value;
+
+        if (!raw.trim()) {
+            protectStatus.textContent = 'Error: Hakuna HTML imewekwa.';
+            protectStatus.style.color = '#ff8080';
+            return;
+        }
+
+        try {
+            const encoded = btoa(unescape(encodeURIComponent(raw)));
+            const result = buildProtectedHtml(encoded);
+            protectOutput.value = result;
+            protectStatus.textContent = 'Done: HTML imeprotect auto.';
+            protectStatus.style.color = '#9bffb0';
+            protectCopyStatus.textContent = 'Bado hujafanya copy.';
+            protectCopyStatus.style.color = 'rgba(255,255,255,0.75)';
+        } catch (e) {
+            protectStatus.textContent = 'Error: Imeshindikana ku-protect.';
+            protectStatus.style.color = '#ff8080';
+        }
+    });
+
+    protectClearBtn.addEventListener('click', () => {
+        protectInput.value = '';
+        protectOutput.value = '';
+        protectStatus.textContent = 'Ready: weka HTML kisha bonyeza Protect HTML.';
+        protectStatus.style.color = 'rgba(255,255,255,0.75)';
+        protectCopyStatus.textContent = 'Hakuna kitu bado kimecopiwa.';
+        protectCopyStatus.style.color = 'rgba(255,255,255,0.75)';
+    });
+
+    protectCopyBtn.addEventListener('click', () => {
+        if (!protectOutput.value.trim()) {
+            protectCopyStatus.textContent = 'Hakuna protected HTML ya ku-copy.';
+            protectCopyStatus.style.color = '#ff8080';
+            return;
+        }
+        protectOutput.select();
+        document.execCommand('copy');
+        protectCopyStatus.textContent = 'Protected HTML imecopiwa.';
+        protectCopyStatus.style.color = '#9bffb0';
+    });
+
+    /* ========== UNPROTECTOR ========== */
+
+    const unprotectInput      = document.getElementById('unprotectInput');
+    const unprotectOutput     = document.getElementById('unprotectOutput');
+    const unprotectStatus     = document.getElementById('unprotectStatus');
+    const unprotectCopyStatus = document.getElementById('unprotectCopyStatus');
+    const unprotectBtn        = document.getElementById('unprotectBtn');
+    const unprotectClearBtn   = document.getElementById('unprotectClearBtn');
+    const unprotectCopyBtn    = document.getElementById('unprotectCopyBtn');
+
+    function extractBase64(html) {
+        const match = html.match(/var data = "([^"]+)"/);
+        return match ? match[1] : null;
+    }
+
+    unprotectBtn.addEventListener('click', () => {
+        const raw = unprotectInput.value;
+
+        if (!raw.trim()) {
+            unprotectStatus.textContent = 'Error: Hakuna protected HTML imewekwa.';
+            unprotectStatus.style.color = '#ff8080';
+            return;
+        }
+
+        const base64 = extractBase64(raw);
+
+        if (!base64) {
+            unprotectStatus.textContent = 'Error: Base64 haijapatikana. Hakikisha hii ni protection ya BROKEN LORD.';
+            unprotectStatus.style.color = '#ff8080';
+            return;
+        }
+
+        try {
+            const decoded = decodeURIComponent(escape(atob(base64)));
+            unprotectOutput.value = decoded;
+            unprotectStatus.textContent = 'Done: HTML halisi imefichuliwa.';
+            unprotectStatus.style.color = '#9bffb0';
+            unprotectCopyStatus.textContent = 'Bado hujafanya copy.';
+            unprotectCopyStatus.style.color = 'rgba(255,255,255,0.75)';
+        } catch (e) {
+            unprotectStatus.textContent = 'Error: Imeshindikana kufichua.';
+            unprotectStatus.style.color = '#ff8080';
+        }
+    });
+
+    unprotectClearBtn.addEventListener('click', () => {
+        unprotectInput.value = '';
+        unprotectOutput.value = '';
+        unprotectStatus.textContent = 'Ready: weka protected HTML kisha bonyeza Fichua HTML.';
+        unprotectStatus.style.color = 'rgba(255,255,255,0.75)';
+        unprotectCopyStatus.textContent = 'Hakuna kitu bado kimecopiwa.';
+        unprotectCopyStatus.style.color = 'rgba(255,255,255,0.75)';
+    });
+
+    unprotectCopyBtn.addEventListener('click', () => {
+        if (!unprotectOutput.value.trim()) {
+            unprotectCopyStatus.textContent = 'Hakuna HTML ya ku-copy.';
+            unprotectCopyStatus.style.color = '#ff8080';
+            return;
+        }
+        unprotectOutput.select();
+        document.execCommand('copy');
+        unprotectCopyStatus.textContent = 'HTML halisi imecopiwa.';
+        unprotectCopyStatus.style.color = '#9bffb0';
+    });
+
+    /* ========== LINK INSPECTOR PRO (via proxy) ========== */
+
+    function absoluteUrl(base, relative) {
+        try {
+            return new URL(relative, base).href;
+        } catch {
+            return relative;
+        }
+    }
+
+    const urlInput      = document.getElementById('urlInput');
+    const scanBtn       = document.getElementById('scanBtn');
+    const statusText    = document.getElementById('statusText');
+    const htmlOutput    = document.getElementById('htmlOutput');
+    const cssList       = document.getElementById('cssList');
+    const jsList        = document.getElementById('jsList');
+    const fileViewer    = document.getElementById('fileViewer');
+    const currentFileEl = document.getElementById('currentFile');
+    const viewerStatus  = document.getElementById('viewerStatus');
+    const copyCodeBtn   = document.getElementById('copyCodeBtn');
+
+    let currentFileUrl = null;
+
+    function clearLists() {
+        cssList.innerHTML = '<div>Hakuna bado.</div>';
+        jsList.innerHTML  = '<div>Hakuna bado.</div>';
+    }
+
+    function setStatus(msg, color) {
+        statusText.textContent = msg;
+        statusText.style.color = color || 'rgba(255,255,255,0.8)';
+    }
+
+    function setViewerStatus(msg, color) {
+        viewerStatus.textContent = msg;
+        viewerStatus.style.color = color || 'rgba(255,255,255,0.8)';
+    }
+
+    function buildList(listEl, items, typeLabel) {
+        listEl.innerHTML = '';
+        if (!items.length) {
+            listEl.innerHTML = '<div>Hakuna ' + typeLabel + ' zilizopatikana.</div>';
+            return;
+        }
+
+        items.forEach(url => {
+            const div = document.createElement('div');
+            div.className = 'list-item';
+            div.textContent = url;
+            div.dataset.url = url;
+            div.addEventListener('click', () => onFileClick(div));
+            listEl.appendChild(div);
+        });
+    }
+
+    function clearActive(listEl) {
+        Array.from(listEl.querySelectorAll('.list-item.active')).forEach(el => {
+            el.classList.remove('active');
+        });
+    }
+
+    async function fetchViaProxy(targetUrl) {
+        const encoded = encodeURIComponent(targetUrl);
+        const res = await fetch(PROXY_URL + encoded);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return await res.text();
+    }
+
+    async function onFileClick(el) {
+        const url = el.dataset.url;
+        currentFileUrl = url;
+        currentFileEl.textContent = url;
+        fileViewer.value = '';
+        setViewerStatus('Inajaribu kufetch code ya file kupitia proxy...', 'rgba(255,255,255,0.8)');
+
+        clearActive(cssList);
+        clearActive(jsList);
+        el.classList.add('active');
+
+        try {
+            const text = await fetchViaProxy(url);
+            fileViewer.value = text;
+            setViewerStatus('Done: code ya file imepatikana kupitia proxy.', '#9bffb0');
+        } catch (e) {
+            console.error(e);
+            fileViewer.value = '';
+            setViewerStatus('Error: Imeshindikana kusoma file hata kupitia proxy.', '#ff8080');
+        }
+    }
+
+    scanBtn.addEventListener('click', async () => {
+        const url = urlInput.value.trim();
+        htmlOutput.value = '';
+        fileViewer.value = '';
+        currentFileUrl = null;
+        currentFileEl.textContent = 'Hakuna file lililochaguliwa.';
+        clearLists();
+        setViewerStatus('Bofya file upande wa juu ili kujaribu kufetch code yake (kupitia proxy).');
+
+        if (!url) {
+            setStatus('Error: Weka URL kwanza.', '#ff8080');
+            return;
+        }
+
+        setStatus('Inascann link kupitia proxy...', 'rgba(255,255,255,0.8)');
+
+        try {
+            const text = await fetchViaProxy(url);
+            htmlOutput.value = text;
+
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(text, 'text/html');
+            const base = url;
+
+            const cssHrefs = Array.from(doc.querySelectorAll('link[rel="stylesheet"]'))
+                .map(l => l.getAttribute('href'))
+                .filter(Boolean)
+                .map(h => absoluteUrl(base, h));
+
+            const jsSrcs = Array.from(doc.querySelectorAll('script[src]'))
+                .map(s => s.getAttribute('src'))
+                .filter(Boolean)
+                .map(s => absoluteUrl(base, s));
+
+            buildList(cssList, cssHrefs, 'CSS files');
+            buildList(jsList, jsSrcs, 'JS files');
+
+            setStatus('Done: HTML + files zimepatikana kupitia proxy.', '#9bffb0');
+        } catch (e) {
+            console.error(e);
+            setStatus('Error: Imeshindikana kusoma page hata kupitia proxy.', '#ff8080');
+        }
+    });
+
+    copyCodeBtn.addEventListener('click', () => {
+        if (!fileViewer.value.trim()) {
+            setViewerStatus('Hakuna code ya ku-copy.', '#ff8080');
+            return;
+        }
+        fileViewer.select();
+        document.execCommand('copy');
+        setViewerStatus('Code ya file imecopiwa.', '#9bffb0');
+    });
+</script>
+
+</body>
+</html>
