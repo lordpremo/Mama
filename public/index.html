@@ -389,8 +389,8 @@
 </footer>
 
 <script>
-    // PROXY YA VERCEL – itaenda /api/proxy.php
-    const PROXY_URL = '/api/proxy.php?url=';
+    // PROXY YA VERCEL – itaenda /api/proxy.js
+    const PROXY_URL = '/api/proxy?url=';
 
     /* ========== PROTECTOR ========== */
 
@@ -481,209 +481,207 @@
     const unprotectOutput     = document.getElementById('unprotectOutput');
     const unprotectStatus     = document.getElementById('unprotectStatus');
     const unprotectCopyStatus = document.getElementById('unprotectCopyStatus');
-    const unprotectBtn        = document.getElementById('unprotectBtn');
-    const unprotectClearBtn   = document.getElementById('unprotectClearBtn');
     const unprotectCopyBtn    = document.getElementById('unprotectCopyBtn');
 
-    function extractBase64(html) {
-        const match = html.match(/var data = "([^"]+)"/);
-        return match ? match[1] : null;
+function extractBase64(html) {
+    const match = html.match(/var data = "([^"]+)"/);
+    return match ? match[1] : null;
+}
+
+unprotectBtn.addEventListener('click', () => {
+    const raw = unprotectInput.value;
+
+    if (!raw.trim()) {
+        unprotectStatus.textContent = 'Error: Hakuna protected HTML imewekwa.';
+        unprotectStatus.style.color = '#ff8080';
+        return;
     }
 
-    unprotectBtn.addEventListener('click', () => {
-        const raw = unprotectInput.value;
+    const base64 = extractBase64(raw);
 
-        if (!raw.trim()) {
-            unprotectStatus.textContent = 'Error: Hakuna protected HTML imewekwa.';
-            unprotectStatus.style.color = '#ff8080';
-            return;
-        }
+    if (!base64) {
+        unprotectStatus.textContent = 'Error: Base64 haijapatikana. Hakikisha hii ni protection ya BROKEN LORD.';
+        unprotectStatus.style.color = '#ff8080';
+        return;
+    }
 
-        const base64 = extractBase64(raw);
-
-        if (!base64) {
-            unprotectStatus.textContent = 'Error: Base64 haijapatikana. Hakikisha hii ni protection ya BROKEN LORD.';
-            unprotectStatus.style.color = '#ff8080';
-            return;
-        }
-
-        try {
-            const decoded = decodeURIComponent(escape(atob(base64)));
-            unprotectOutput.value = decoded;
-            unprotectStatus.textContent = 'Done: HTML halisi imefichuliwa.';
-            unprotectStatus.style.color = '#9bffb0';
-            unprotectCopyStatus.textContent = 'Bado hujafanya copy.';
-            unprotectCopyStatus.style.color = 'rgba(255,255,255,0.75)';
-        } catch (e) {
-            unprotectStatus.textContent = 'Error: Imeshindikana kufichua.';
-            unprotectStatus.style.color = '#ff8080';
-        }
-    });
-
-    unprotectClearBtn.addEventListener('click', () => {
-        unprotectInput.value = '';
-        unprotectOutput.value = '';
-        unprotectStatus.textContent = 'Ready: weka protected HTML kisha bonyeza Fichua HTML.';
-        unprotectStatus.style.color = 'rgba(255,255,255,0.75)';
-        unprotectCopyStatus.textContent = 'Hakuna kitu bado kimecopiwa.';
+    try {
+        const decoded = decodeURIComponent(escape(atob(base64)));
+        unprotectOutput.value = decoded;
+        unprotectStatus.textContent = 'Done: HTML halisi imefichuliwa.';
+        unprotectStatus.style.color = '#9bffb0';
+        unprotectCopyStatus.textContent = 'Bado hujafanya copy.';
         unprotectCopyStatus.style.color = 'rgba(255,255,255,0.75)';
+    } catch (e) {
+        unprotectStatus.textContent = 'Error: Imeshindikana kufichua.';
+        unprotectStatus.style.color = '#ff8080';
+    }
+});
+
+unprotectClearBtn.addEventListener('click', () => {
+    unprotectInput.value = '';
+    unprotectOutput.value = '';
+    unprotectStatus.textContent = 'Ready: weka protected HTML kisha bonyeza Fichua HTML.';
+    unprotectStatus.style.color = 'rgba(255,255,255,0.75)';
+    unprotectCopyStatus.textContent = 'Hakuna kitu bado kimecopiwa.';
+    unprotectCopyStatus.style.color = 'rgba(255,255,255,0.75)';
+});
+
+unprotectCopyBtn.addEventListener('click', () => {
+    if (!unprotectOutput.value.trim()) {
+        unprotectCopyStatus.textContent = 'Hakuna HTML ya ku-copy.';
+        unprotectCopyStatus.style.color = '#ff8080';
+        return;
+    }
+    unprotectOutput.select();
+    document.execCommand('copy');
+    unprotectCopyStatus.textContent = 'HTML halisi imecopiwa.';
+    unprotectCopyStatus.style.color = '#9bffb0';
+});
+
+/* ========== LINK INSPECTOR PRO (via proxy) ========== */
+
+function absoluteUrl(base, relative) {
+    try {
+        return new URL(relative, base).href;
+    } catch {
+        return relative;
+    }
+}
+
+const urlInput      = document.getElementById('urlInput');
+const scanBtn       = document.getElementById('scanBtn');
+const statusText    = document.getElementById('statusText');
+const htmlOutput    = document.getElementById('htmlOutput');
+const cssList       = document.getElementById('cssList');
+const jsList        = document.getElementById('jsList');
+const fileViewer    = document.getElementById('fileViewer');
+const currentFileEl = document.getElementById('currentFile');
+const viewerStatus  = document.getElementById('viewerStatus');
+const copyCodeBtn   = document.getElementById('copyCodeBtn');
+
+let currentFileUrl = null;
+
+function clearLists() {
+    cssList.innerHTML = '<div>Hakuna bado.</div>';
+    jsList.innerHTML  = '<div>Hakuna bado.</div>';
+}
+
+function setStatus(msg, color) {
+    statusText.textContent = msg;
+    statusText.style.color = color || 'rgba(255,255,255,0.8)';
+}
+
+function setViewerStatus(msg, color) {
+    viewerStatus.textContent = msg;
+    viewerStatus.style.color = color || 'rgba(255,255,255,0.8)';
+}
+
+function buildList(listEl, items, typeLabel) {
+    listEl.innerHTML = '';
+    if (!items.length) {
+        listEl.innerHTML = '<div>Hakuna ' + typeLabel + ' zilizopatikana.</div>';
+        return;
+    }
+
+    items.forEach(url => {
+        const div = document.createElement('div');
+        div.className = 'list-item';
+        div.textContent = url;
+        div.dataset.url = url;
+        div.addEventListener('click', () => onFileClick(div));
+        listEl.appendChild(div);
     });
+}
 
-    unprotectCopyBtn.addEventListener('click', () => {
-        if (!unprotectOutput.value.trim()) {
-            unprotectCopyStatus.textContent = 'Hakuna HTML ya ku-copy.';
-            unprotectCopyStatus.style.color = '#ff8080';
-            return;
-        }
-        unprotectOutput.select();
-        document.execCommand('copy');
-        unprotectCopyStatus.textContent = 'HTML halisi imecopiwa.';
-        unprotectCopyStatus.style.color = '#9bffb0';
+function clearActive(listEl) {
+    Array.from(listEl.querySelectorAll('.list-item.active')).forEach(el => {
+        el.classList.remove('active');
     });
+}
 
-    /* ========== LINK INSPECTOR PRO (via proxy) ========== */
+async function fetchViaProxy(targetUrl) {
+    const encoded = encodeURIComponent(targetUrl);
+    const res = await fetch(PROXY_URL + encoded);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return await res.text();
+}
 
-    function absoluteUrl(base, relative) {
-        try {
-            return new URL(relative, base).href;
-        } catch {
-            return relative;
-        }
-    }
+async function onFileClick(el) {
+    const url = el.dataset.url;
+    currentFileUrl = url;
+    currentFileEl.textContent = url;
+    fileViewer.value = '';
+    setViewerStatus('Inajaribu kufetch code ya file kupitia proxy...', 'rgba(255,255,255,0.8)');
 
-    const urlInput      = document.getElementById('urlInput');
-    const scanBtn       = document.getElementById('scanBtn');
-    const statusText    = document.getElementById('statusText');
-    const htmlOutput    = document.getElementById('htmlOutput');
-    const cssList       = document.getElementById('cssList');
-    const jsList        = document.getElementById('jsList');
-    const fileViewer    = document.getElementById('fileViewer');
-    const currentFileEl = document.getElementById('currentFile');
-    const viewerStatus  = document.getElementById('viewerStatus');
-    const copyCodeBtn   = document.getElementById('copyCodeBtn');
+    clearActive(cssList);
+    clearActive(jsList);
+    el.classList.add('active');
 
-    let currentFileUrl = null;
-
-    function clearLists() {
-        cssList.innerHTML = '<div>Hakuna bado.</div>';
-        jsList.innerHTML  = '<div>Hakuna bado.</div>';
-    }
-
-    function setStatus(msg, color) {
-        statusText.textContent = msg;
-        statusText.style.color = color || 'rgba(255,255,255,0.8)';
-    }
-
-    function setViewerStatus(msg, color) {
-        viewerStatus.textContent = msg;
-        viewerStatus.style.color = color || 'rgba(255,255,255,0.8)';
-    }
-
-    function buildList(listEl, items, typeLabel) {
-        listEl.innerHTML = '';
-        if (!items.length) {
-            listEl.innerHTML = '<div>Hakuna ' + typeLabel + ' zilizopatikana.</div>';
-            return;
-        }
-
-        items.forEach(url => {
-            const div = document.createElement('div');
-            div.className = 'list-item';
-            div.textContent = url;
-            div.dataset.url = url;
-            div.addEventListener('click', () => onFileClick(div));
-            listEl.appendChild(div);
-        });
-    }
-
-    function clearActive(listEl) {
-        Array.from(listEl.querySelectorAll('.list-item.active')).forEach(el => {
-            el.classList.remove('active');
-        });
-    }
-
-    async function fetchViaProxy(targetUrl) {
-        const encoded = encodeURIComponent(targetUrl);
-        const res = await fetch(PROXY_URL + encoded);
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        return await res.text();
-    }
-
-    async function onFileClick(el) {
-        const url = el.dataset.url;
-        currentFileUrl = url;
-        currentFileEl.textContent = url;
+    try {
+        const text = await fetchViaProxy(url);
+        fileViewer.value = text;
+        setViewerStatus('Done: code ya file imepatikana kupitia proxy.', '#9bffb0');
+    } catch (e) {
+        console.error(e);
         fileViewer.value = '';
-        setViewerStatus('Inajaribu kufetch code ya file kupitia proxy...', 'rgba(255,255,255,0.8)');
+        setViewerStatus('Error: Imeshindikana kusoma file hata kupitia proxy.', '#ff8080');
+    }
+}
 
-        clearActive(cssList);
-        clearActive(jsList);
-        el.classList.add('active');
+scanBtn.addEventListener('click', async () => {
+    const url = urlInput.value.trim();
+    htmlOutput.value = '';
+    fileViewer.value = '';
+    currentFileUrl = null;
+    currentFileEl.textContent = 'Hakuna file lililochaguliwa.';
+    clearLists();
+    setViewerStatus('Bofya file upande wa juu ili kujaribu kufetch code yake (kupitia proxy).');
 
-        try {
-            const text = await fetchViaProxy(url);
-            fileViewer.value = text;
-            setViewerStatus('Done: code ya file imepatikana kupitia proxy.', '#9bffb0');
-        } catch (e) {
-            console.error(e);
-            fileViewer.value = '';
-            setViewerStatus('Error: Imeshindikana kusoma file hata kupitia proxy.', '#ff8080');
-        }
+    if (!url) {
+        setStatus('Error: Weka URL kwanza.', '#ff8080');
+        return;
     }
 
-    scanBtn.addEventListener('click', async () => {
-        const url = urlInput.value.trim();
-        htmlOutput.value = '';
-        fileViewer.value = '';
-        currentFileUrl = null;
-        currentFileEl.textContent = 'Hakuna file lililochaguliwa.';
-        clearLists();
-        setViewerStatus('Bofya file upande wa juu ili kujaribu kufetch code yake (kupitia proxy).');
+    setStatus('Inascann link kupitia proxy...', 'rgba(255,255,255,0.8)');
 
-        if (!url) {
-            setStatus('Error: Weka URL kwanza.', '#ff8080');
-            return;
-        }
+    try {
+        const text = await fetchViaProxy(url);
+        htmlOutput.value = text;
 
-        setStatus('Inascann link kupitia proxy...', 'rgba(255,255,255,0.8)');
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(text, 'text/html');
+        const base = url;
 
-        try {
-            const text = await fetchViaProxy(url);
-            htmlOutput.value = text;
+        const cssHrefs = Array.from(doc.querySelectorAll('link[rel="stylesheet"]'))
+            .map(l => l.getAttribute('href'))
+            .filter(Boolean)
+            .map(h => absoluteUrl(base, h));
 
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(text, 'text/html');
-            const base = url;
+        const jsSrcs = Array.from(doc.querySelectorAll('script[src]'))
+            .map(s => s.getAttribute('src'))
+            .filter(Boolean)
+            .map(s => absoluteUrl(base, s));
 
-            const cssHrefs = Array.from(doc.querySelectorAll('link[rel="stylesheet"]'))
-                .map(l => l.getAttribute('href'))
-                .filter(Boolean)
-                .map(h => absoluteUrl(base, h));
+        buildList(cssList, cssHrefs, 'CSS files');
+        buildList(jsList, jsSrcs, 'JS files');
 
-            const jsSrcs = Array.from(doc.querySelectorAll('script[src]'))
-                .map(s => s.getAttribute('src'))
-                .filter(Boolean)
-                .map(s => absoluteUrl(base, s));
+        setStatus('Done: HTML + files zimepatikana kupitia proxy.', '#9bffb0');
+    } catch (e) {
+        console.error(e);
+        setStatus('Error: Imeshindikana kusoma page hata kupitia proxy.', '#ff8080');
+    }
+});
 
-            buildList(cssList, cssHrefs, 'CSS files');
-            buildList(jsList, jsSrcs, 'JS files');
-
-            setStatus('Done: HTML + files zimepatikana kupitia proxy.', '#9bffb0');
-        } catch (e) {
-            console.error(e);
-            setStatus('Error: Imeshindikana kusoma page hata kupitia proxy.', '#ff8080');
-        }
-    });
-
-    copyCodeBtn.addEventListener('click', () => {
-        if (!fileViewer.value.trim()) {
-            setViewerStatus('Hakuna code ya ku-copy.', '#ff8080');
-            return;
-        }
-        fileViewer.select();
-        document.execCommand('copy');
-        setViewerStatus('Code ya file imecopiwa.', '#9bffb0');
-    });
+copyCodeBtn.addEventListener('click', () => {
+    if (!fileViewer.value.trim()) {
+        setViewerStatus('Hakuna code ya ku-copy.', '#ff8080');
+        return;
+    }
+    fileViewer.select();
+    document.execCommand('copy');
+    setViewerStatus('Code ya file imecopiwa.', '#9bffb0');
+});
 </script>
 
 </body>
